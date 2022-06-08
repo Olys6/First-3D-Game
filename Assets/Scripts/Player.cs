@@ -13,6 +13,10 @@ public class Player : MonoBehaviour
     private float verticalInput;
     private Rigidbody rigidbodyComponent;
     private int superJumpsRemaining;
+    private bool isRespawnSet = false;
+    private float respawnPositionX;
+    private float respawnPositionY;
+    private float respawnPositionZ;
 
     private float yaw = 0.0f, pitch = 0.0f;
 
@@ -40,6 +44,19 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             jumpKeyWasPressed = true;
+        }
+
+        if (rigidbodyComponent.position.y < 0.0f)
+        {
+            if(isRespawnSet)
+            {
+                rigidbodyComponent.transform.position = new Vector3(respawnPositionX, respawnPositionY, respawnPositionZ);
+                superJumpsRemaining++;
+            } 
+            else
+            {
+                rigidbodyComponent.transform.position = new Vector3(-3.86f, 2.6f, -0.59f);
+            }
         }
 
         //horizontalInput = Input.GetAxis("Horizontal") * 3;
@@ -96,11 +113,35 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.layer == 7)
+
+        if (other.gameObject.layer == 7)
         {
+            Debug.Log(other.gameObject.name);
+            respawnPositionX = other.gameObject.transform.position.x;
+            respawnPositionY = other.gameObject.transform.position.y;
+            respawnPositionZ = other.gameObject.transform.position.z;
+            Debug.Log($"{respawnPositionX}, {respawnPositionY}, {respawnPositionZ}");
+            isRespawnSet = true;
             Destroy(other.gameObject);
             superJumpsRemaining++;
+
         }
+
+        if (other.gameObject.layer == 8)
+        {
+            if(isRespawnSet)
+            {
+                rigidbodyComponent.transform.position = new Vector3(respawnPositionX, respawnPositionY, respawnPositionZ);
+                superJumpsRemaining++;
+            } 
+            else
+            {
+                rigidbodyComponent.transform.position = new Vector3(-3.86f, 2.6f, -0.59f);
+            }
+
+        }
+
+        
     }
 
 }
